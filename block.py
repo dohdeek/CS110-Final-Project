@@ -3,6 +3,10 @@ import random
 
 from coords import *
 
+
+''' Block sprite class that can be a walking space, a barrel space, a rock space,
+a bomb 1, 2, or 3 space, a fire space, a firebomb space, or a power-up space.'''
+
 class Block(pygame.sprite.Sprite):
  
     WALK_IMG = pygame.image.load('block_images//walk.jpg')
@@ -18,6 +22,11 @@ class Block(pygame.sprite.Sprite):
     PWR_INVI_IMG = pygame.image.load('block_images//pwr_invi.jpg')
     PWR_LONG_IMG = pygame.image.load('block_images//pwr_long.jpg')
 
+    '''Initialize location, size, form, contents, fire length, set of fire
+    locations, drop time, and fire time. Blocks always have location, size,
+    form. Only barrels or fires can have saved contents. Only bombs can have
+    set of fire locations and drop time. Only fires or firebombs can have a
+    fire time.'''
     def __init__(self, pixels, size, form):
 
         pygame.sprite.Sprite.__init__(self)
@@ -52,21 +61,21 @@ class Block(pygame.sprite.Sprite):
 
             self.image = Block.BARR_IMG
 
-            content = random.randrange(0, 10)
+            content = random.randrange(0, 100)
 
-            if content < 5:
+            if content < 50:
 
                 self.contents = 'PWR_BOMB'
 
-            elif content == 5:
+            elif content < 58:
 
                 self.contents = 'PWR_FAST'
 
-            elif content == 6:
+            elif content < 66:
 
                 self.contents = 'PWR_INVI'
 
-            elif content == 7:
+            elif content < 74:
 
                 self.contents = 'PWR_LONG'
  
@@ -79,7 +88,9 @@ class Block(pygame.sprite.Sprite):
 
         return str(self.form) + str(self.coords)
     
-
+    ''' Handle an update from the controller. Turn into bomb,
+    turn into fire (saving contents) or into firebomb if bomb,
+    turn into walk (revealing contents)'''
     def update(self, new_form):
 
         old_form = self.form
@@ -90,34 +101,33 @@ class Block(pygame.sprite.Sprite):
 
             self.image = Block.BOMB_1_IMG
 
-            self.drop_time = pygame.time.get_ticks()
+            self.drop_time = pygame.time.get_ticks() # Set a drop time to expire
 
         elif self.form == 'FIRE':
 
-            if old_form[:3] == 'PWR': 
+            if old_form[:3] == 'PWR': # Save power-up form to content to be exposed when turned to walk (like barrels) so power-ups are not deleted by fire
 
-                print(old_form)
-                self.contents = old_form # Save content to be exposed when walk (like barrels)
+                self.contents = old_form 
 
-            if old_form != 'BOMB':
+            if old_form != 'BOMB': # If not a bomb, turn to fire image
 
                 self.image = Block.FIRE_IMG
 
-            else:
+            else: # If a bomb, turn to firebomb image
 
-                self.form = 'FIREBOMB'
+                self.form = 'FIREBOMB' 
                 
                 self.image = Block.FIREBOMB_IMG
 
-            self.fire_time = pygame.time.get_ticks()
+            self.fire_time = pygame.time.get_ticks() # Set a fire time to expire
 
-        elif self.form == 'WALK' and not self.contents:
+        elif self.form == 'WALK' and not self.contents: # If being turned to walk and no contents, turn into walk image
 
             self.contents = None
             
             self.image = Block.WALK_IMG
 
-        elif self.form == 'WALK' and self.contents[:3] == 'PWR':
+        elif self.form == 'WALK' and self.contents: # If being turned to walk and contents, turn into power-up image
  
             self.form = self.contents
 
@@ -137,4 +147,4 @@ class Block(pygame.sprite.Sprite):
 
                 self.image = Block.PWR_LONG_IMG
 
-                self.contents = None
+            self.contents = None

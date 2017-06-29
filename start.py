@@ -1,8 +1,9 @@
 from coords import *
 
-def check_barrel(x, y):
+'''Read map in and check if block is barrel'''
+def check_barrel(x, y, MAP):
 
-    with open('map.txt') as file:
+    with open('map_'+str(MAP)+'.txt') as file:
 
         rows = file.readlines()
         
@@ -10,7 +11,8 @@ def check_barrel(x, y):
         
         return bool(block)           
 
-def gen_blocks():
+'''Generate initializer data fro blocks'''
+def gen_blocks(MAP):
 
     for i in range(13):
     
@@ -26,7 +28,7 @@ def gen_blocks():
                 
                 yield (x, y, 'ROCK')
 
-            elif check_barrel(i, j):
+            elif check_barrel(i, j, MAP):
 
                 x, y = coords_pixels((i, j))
 
@@ -38,11 +40,10 @@ def gen_blocks():
                 
                 yield (x, y, 'WALK')
 
-def gen_players():
+'''Generate initializer data for blocks'''
+def gen_players(num_players):
 
     start_coords = [(1, 1), (11, 11), (1, 11), (11, 1)]
-    
-    num_players = 4
 
     for ID in range(num_players):
 
@@ -53,6 +54,7 @@ def gen_players():
 
         yield (x, y, ID)
 
+'''Generate rails for movement to be checked against'''
 def gen_rail():
 
     for i in range(1, 12):

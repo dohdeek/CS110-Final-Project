@@ -2,10 +2,12 @@ import pygame
 
 from coords import *
 
+'''Player sprite class that can be one of four players.'''
 class Player(pygame.sprite.Sprite):
 
-    
-
+    ''' Initialize location, size, ID, move x, move y, button pressed
+    states, lives, number of bombs, bomb regen timer, length of bomb fires,
+    speed, power-fast timer, power-invi timer, and dead timer. '''
     def __init__(self, pixels, size, ID):
         
         pygame.sprite.Sprite.__init__(self)
@@ -27,18 +29,18 @@ class Player(pygame.sprite.Sprite):
         self.right_pressed = False
         self.down_pressed = False
         self.left_pressed = False
-
         self.on_bomb = False # Store if on bomb to slide off manually afterwards
+
+        self.lives = 0 # These are adopted from controller       
         self.num_bombs = 0
-        self.fire_len = 3
-
+        self.regn_time = 0
+        self.fire_len = 0
         self.speed = 0
+        
         self.fast_time = None
-
         self.invi_time = None
         self.dead_time = None
-        self.lives = 3
-        
+
         reg_img_str = 'char_images//char_'+str(self.ID)+'.png'
         dead_img_str = 'char_images//char_'+str(self.ID)+'_dead.png'
         invi_img_str = 'char_images//char_'+str(self.ID)+'_invi.png'
@@ -53,8 +55,9 @@ class Player(pygame.sprite.Sprite):
 
         return 'Player '+str(self.ID)
         
-
-    def stick_player(self, degree): # Round player position (deg = 1 means nearest block, deg = 2 means nearest half-block, etc.
+    ''' Round player position to nearest block based on degree.
+    Degree = 1 means nearest block, degree = 2 means nearest half-block, etc.'''
+    def stick_player(self, degree): 
 
         x_coord, y_coord = pixels_coords((self.x, self.y))
 
@@ -75,7 +78,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect = pygame.Rect(self.x, self.y, self.w, self. h)
     
-
+    '''Image and movement updates'''
     def dead_player(self):
 
         self.move_x = 0
@@ -83,7 +86,6 @@ class Player(pygame.sprite.Sprite):
 
         self.dead_time = pygame.time.get_ticks()
         self.lives -= 1
-        print(self.lives)
 
         self.image = self.dead_img
         
